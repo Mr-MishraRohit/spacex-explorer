@@ -8,7 +8,8 @@ class GraphQLService {
 
     return GraphQLClient(
       link: httpLink,
-      cache: GraphQLCache(store: InMemoryStore()),
+      // cache: GraphQLCache(store: InMemoryStore()),
+      cache: GraphQLCache(store: HiveStore()),
     );
   }
 }
