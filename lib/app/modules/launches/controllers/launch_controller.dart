@@ -189,25 +189,24 @@ class LaunchController extends GetxController {
         if (fetched != null && fetched.isNotEmpty) {
           // 👉 Apply client-side filters here
           final filtered = fetched.where((launch) {
-            final launchYear = DateTime.tryParse(
-              launch['launch_date_utc'] ?? '',
-            )?.year.toString();
-            // final matchesYear = year != null && year == launchYear;
-            if (year!.isNotEmpty && year == launchYear) {
-              return true;
-            }
+            final launchYear = DateTime.tryParse(launch['launch_date_utc'] ?? '')
+                ?.year
+                .toString();
+            final matchesYear = year == null || year == launchYear;
 
-            // if (rocketName != null &&
-            //     (launch['rocket']['rocket_name'] as String).toLowerCase().contains(rocketName.toLowerCase())) {
-            //   return true;
-            // }
-            //
-            // if (success != null && (launch['launch_success']?.toString() == success)) {
-            //
-            //   return true;
-            // }
+            final matchesRocket = rocketName == null ||
+                (launch['rocket']['rocket_name'] as String)
+                    .toLowerCase()
+                    .contains(rocketName.toLowerCase());
 
-            return true; // All active filters matched
+
+            // final matchesSuccess = success == null ||
+            //     (launch['launch_success']?.toString() == success);
+            // Debug.setLog("launch_success: $success matching ${launch['launch_success']?.toString() == success} launch['launch_success']?.toString() ${launch['launch_success']?.toString()}");
+
+            Debug.setLog("Return type ${matchesYear || matchesRocket}");
+            return matchesYear && matchesRocket;
+
           }).toList();
 
           Debug.setLog("filtered $filtered");

@@ -4,6 +4,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:spacex_explorer/app/strings/string_constant.dart';
 import 'app/bindings/initial_binding.dart';
 import 'app/data/graphql/graphql_client.dart';
+import 'app/modules/launches/controllers/launch_controller.dart';
 import 'app/routes/app_pages.dart';
 
 
@@ -14,7 +15,7 @@ void main() async {
 
   final client =
   GraphQLService.initClient(); // Initializes the GraphQL client instance
-
+  Get.put(LaunchController(client)); // Register here
 
   runApp(
     MyApp(client: client,),
