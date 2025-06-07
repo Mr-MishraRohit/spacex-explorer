@@ -16,20 +16,24 @@ class LaunchesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final launchController = Get.find<LaunchController>();
-
     return Scaffold(
       appBar: AppBar(
-        title: ContentText(
-          color: Colors.black87,
-          text: StringConstant.launchScreen,
-          textSize: 5.6.w,
-        ),
+        title: ContentText(text: StringConstant.launchScreen, textSize: 5.6.w),
         actions: [
           IconButton(
             icon: const Icon(Icons.reset_tv_outlined),
             onPressed: () {
               launchController.resetFilters();
               launchController.fetchLaunches(refresh: true); // Refresh data
+            },
+          ),
+
+          IconButton(
+            icon: Icon(Get.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () {
+              Get.changeThemeMode(
+                Get.isDarkMode ? ThemeMode.light : ThemeMode.dark,
+              );
             },
           ),
         ],
@@ -90,7 +94,9 @@ class LaunchesScreen extends StatelessWidget {
                                 )
                               : const Icon(Icons.rocket),
                           title: ContentText(
-                            color: Colors.black45,
+                            color: Get.isDarkMode
+                                ? Colors.white
+                                : Colors.black87,
                             text: launch['mission_name'] ?? 'Unnamed Mission',
                             textSize: 5.w,
                           ),
