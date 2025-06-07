@@ -8,6 +8,7 @@ import '../../models/launch_model.dart';
 import '../controllers/launch_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'launch_counter_down.dart';
 import 'launch_filter_bar.dart';
 
 class LaunchesScreen extends StatelessWidget {
@@ -40,6 +41,7 @@ class LaunchesScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
+
           Expanded(
             child: Obx(() {
               if (launchController.isLoading.value) {
@@ -100,11 +102,17 @@ class LaunchesScreen extends StatelessWidget {
                             text: launch['mission_name'] ?? 'Unnamed Mission',
                             textSize: 5.w,
                           ),
-                          subtitle: ContentText(
-                            color: Colors.black45,
-                            text:
-                                '${launch['rocket']['rocket_name']} • $formattedDate',
-                            textSize: 4.w,
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ContentText(
+                                color: Colors.black45,
+                                text:
+                                    '${launch['rocket']['rocket_name']} • $formattedDate',
+                                textSize: 4.w,
+                              ),
+                          LaunchCountdown(launchDate: date!,),
+                            ],
                           ),
                           trailing: Icon(
                             launch['launch_success'] == true
