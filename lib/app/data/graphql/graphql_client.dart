@@ -1,9 +1,10 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:spacex_explorer/app/appUrl/app_url.dart';
 
 class GraphQLService {
   static GraphQLClient initClient() {
     final HttpLink httpLink = HttpLink(
-      'https://spacex-production.up.railway.app/',
+      AppUrls.baseUrl,
     );
 
     return GraphQLClient(

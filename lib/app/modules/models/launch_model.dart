@@ -1,7 +1,8 @@
 class LaunchModel {
+  final String id;
   final String missionName;
   final String? missionPatch;
-  final String? youtubeLink;
+  final String?   youtubeLink;
   final List<String> flickrImages;
   final String? rocketName;
   final bool? launchSuccess;
@@ -10,6 +11,7 @@ class LaunchModel {
   final Map<String, dynamic> rocket;
 
   LaunchModel({
+    required this.id,
     required this.missionName,
     required this.rocketName,
     required this.missionPatch,
@@ -23,6 +25,7 @@ class LaunchModel {
 
   factory LaunchModel.fromMap(Map<String, dynamic> map) {
     return LaunchModel(
+      id: map['id'] ?? '0',
       missionName: map['mission_name'] ?? 'Unnamed',
       missionPatch: map['links']['mission_patch'],
       youtubeLink: map['links']['video_link'],

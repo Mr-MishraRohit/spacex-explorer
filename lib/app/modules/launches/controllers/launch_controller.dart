@@ -1,9 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart' show ScrollController;
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-
+import '../../../data/graphql/queries/filtered_launches_query.dart';
 import '../../../utils/utils.dart';
 
 class LaunchController extends GetxController {
@@ -11,7 +9,12 @@ class LaunchController extends GetxController {
   final isLoading = false.obs;
   final hasMore = true.obs;
   final limit = 10;
+  final filterLimit = 1000;
   int offset = 0;
+
+  final selectedYear = RxnString();
+  final selectedSuccess = RxnBool();
+  final selectedRocket = RxnString();
 
   final scrollController = ScrollController();
   final GraphQLClient client;
@@ -34,6 +37,13 @@ class LaunchController extends GetxController {
     }
   }
 
+  // Call this to clear filters
+  void resetFilters() {
+    selectedYear.value = null;
+    selectedRocket.value = null;
+    selectedSuccess.value = null;
+  }
+
   Future<void> fetchLaunches({bool refresh = false}) async {
     // If refresh is true, reset offset and clear previous launches
     if (refresh) {
@@ -45,32 +55,31 @@ class LaunchController extends GetxController {
     isLoading.value = true; // Show loading spinner or progress state
 
     // GraphQL query to fetch past launches with limit and offset for pagination
-    const query = '''
-      query GetPastLaunches(\$limit: Int!, \$offset: Int!) {
-        launchesPast(limit: \$limit, offset: \$offset) {
-          mission_name
-          launch_date_utc
-          rocket {
-            rocket_name
-          }
-          launch_success
-          links {
-            mission_patch_small
-          }
-        }
-      }
-    ''';
-
-    // final client = GraphQLProvider.of(Get.context!).value;
+    // const query = '''
+    //   query GetPastLaunches(\$limit: Int!, \$offset: Int!) {
+    //     launchesPast(limit: \$limit, offset: \$offset) {
+    //       mission_name
+    //       launch_date_utc
+    //       rocket {
+    //         rocket_name
+    //       }
+    //       launch_success
+    //       links {
+    //         mission_patch_small
+    //       }
+    //     }
+    //   }
+    // ''';
 
     // Check for internet connectivity using utility method
 
     bool isConnected = await Utils.isInternetConnected();
     if (isConnected) {
       // When online, fetch data from API with cache fallback
+
       final result = await client.query(
         QueryOptions(
-          document: gql(query), // GraphQL query
+          document: gql(launchesQuery), // GraphQL query
           fetchPolicy: FetchPolicy.cacheFirst, // ✅ cache for offline
           variables: {'limit': limit, 'offset': offset}, // Required variables
         ),
@@ -79,36 +88,40 @@ class LaunchController extends GetxController {
       if (result.hasException) {
         // Show error if API call fails
         Get.snackbar('Error', result.exception.toString());
-        hasMore.value = false;
+        Debug.setLog("Error Set: ${result.exception.toString()}");
+        isLoading.value = false;
+        hasMore.value = false; // No more data available
       } else {
         // Log the fetched data (optional, for debugging)
-        log("Result: ${result.data}");
+        Debug.setLog("Result: ${result.data}");
 
         // Parse the list of launches from the response
         final fetched = result.data?['launchesPast'] as List?;
         // Add the fetched data to the observable list
         if (fetched != null && fetched.isNotEmpty) {
+          Debug.setLog("filtered $fetched");
           launches.addAll(fetched.cast<Map<String, dynamic>>());
           offset += limit; // Move to next page for pagination
         } else {
           hasMore.value = false; // No more data available
+          isLoading.value = false;
         }
       }
     } else {
       // No internet available — try to load data from cache
       isLoading.value = false;
 
-      final QueryOptions options = QueryOptions(
-        document: gql(query), // Same query
-        fetchPolicy: FetchPolicy.cacheFirst,
-        variables: {'limit': limit, 'offset': offset},
+      final result = await client.query(
+        QueryOptions(
+          document: gql(launchesQuery), // GraphQL query
+          fetchPolicy: FetchPolicy.cacheFirst, // ✅ cache for offline
+          variables: {'limit': limit, 'offset': offset}, // Required variables
+        ),
       );
-
-      final result = await client.query(options);
 
       if (result.hasException) {
         Get.snackbar('Error (Offline)', result.exception.toString());
-        hasMore.value = false;
+        isLoading.value = false;
       } else {
         // Log the fetched data (optional, for debugging)
         Debug.setLog("Result (from cache): ${result.data}");
