@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:spacex_explorer/app/strings/string_constant.dart';
 import 'app/bindings/initial_binding.dart';
 import 'app/data/graphql/graphql_client.dart';
 import 'app/routes/app_pages.dart';
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
         initialRoute: AppPages.initial,
         getPages: AppPages.routes,
         theme: ThemeData(useMaterial3: true),
-        title: 'SpaceX Explorer',
+        title: StringConstant.appName,
       ),
     );
   }
